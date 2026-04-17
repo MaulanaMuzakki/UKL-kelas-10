@@ -1,0 +1,33 @@
+<?php
+include '../koneksi/koneksi.php';
+include '../koneksi/session.php';
+autentikasi('../auth/login.php');
+$user_id = $_SESSION['id_user'];
+
+$query = mysqli_query($conn, "SELECT groups.id_group, groups.nama_grub FROM groups JOIN member ON groups.id_group = member.id_group WHERE member.id_user = $user_id");
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DanaKita</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <div class="atasan-group">
+        <h1>Group</h1>
+        <h3 class="tambah-grub"><a href="../admin/tambahgroup.php">Tambah Group</a></h3>
+    </div>
+    <div class="outer">
+    <?php while($row = mysqli_fetch_assoc($query)) { ?>
+        <div class="group1">
+            <a name="group" href="isigroup.php?group=<?php echo $row['id_group']; ?>"><?php echo $row['nama_grub']; ?></a>
+            <br>
+            <img src="../assets/gambarcontoh.png" alt="Kelas">
+        </div>
+    <?php } ?>    
+    </div>
+</body>
+</html>
