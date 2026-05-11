@@ -1,5 +1,6 @@
 <?php
 include 'user/layout/sidebar.php';
+sidebar('dashboard.php', 'user/group.php', 'history.php', 'bills.php', 'auth/logout.php');
 include 'koneksi/session.php';
 autentikasi('auth/login.php');
 ?>
