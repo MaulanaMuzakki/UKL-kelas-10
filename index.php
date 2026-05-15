@@ -1,6 +1,6 @@
 <?php
 include 'user/layout/sidebar.php';
-sidebar('dashboard.php', 'user/group.php', 'history.php', 'bills.php', 'auth/logout.php');
+sidebar('dashboard.php', 'user/group.php', 'bills.php', 'auth/logout.php', 'user/akun.php');
 include 'koneksi/session.php';
 autentikasi('auth/login.php');
 ?>
@@ -18,15 +18,15 @@ autentikasi('auth/login.php');
         <h1>Dashboard</h1>
         <div class="dashboard-atas">
             <div class="dashboard1">
-                <h3>Total bayar</h3>
+                <h3>Total Saldo</h3>
                 <p>....</p>
             </div>
             <div class="dashboard1">
-                <h3>Total pengeluaran</h3>
+                <h3>Pembayaran bulan ini</h3>
                 <p>....</p>
             </div>
             <div class="dashboard1">
-                <h3>Tagihan pembayaran</h3>
+                <h3>Tagihan Aktif</h3>
                 <p>....</p>
             </div>
         </div>
@@ -40,11 +40,11 @@ autentikasi('auth/login.php');
             </div>
             <div class="kanan-tumpuk">
                 <div class="dashboard1">
-                    <h3>Aktivitas terakhir</h3>
+                    <h3>Pembayaran terakhir</h3>
                     <p>....</p>
                 </div>
                 <div class="dashboard1">
-                    <h3>pengeluaran baru-baru ini</h3>
+                    <h3>pengeluaran grub terbaru</h3>
                     <p>....</p>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-<?php function sidebar($dashboard, $group, $history, $bills, $logout) { ?>
+<?php function sidebar($dashboard, $group, $bills, $logout, $profil) { ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,12 +14,14 @@
     <ul>
         <li><a href="<?= $dashboard ?>">Dashboard</a></li>
         <li><a href="<?= $group ?>">Group</a></li>
-        <li><a href="<?= $history ?>">Riwayat</a></li>
         <li><a href="<?= $bills ?>">Tagihan</a></li>
     </ul>
 
     <div class="logout">
         <a href="<?= $logout ?>">Logout</a>
+    </div>
+    <div class="profil">
+        <a href="<?= $profil ?>">Profil</a>
     </div>
 </div>
 </body>

@@ -4,27 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="stylesheet" href="../style/style.css">
 </head>
-<body>
-    <h1>Register</h1>
-    <form action="proses.php" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
+<body class="login-body" style="margin:0px;">
+    <div class="login-wrap">
+        <h1>Register</h1>
+        <form action="proses.php" method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <br>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <br>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <br>
 
-        <button type="submit" name="register">Register</button>
-    </form>
+            <button type="submit" name="register">Register</button>
+        </form>
 
-    <div>
-        <p>Already have an account? <a href="login.php">Log in here</a></p>
+        <div>
+            <p>Already have an account? <a href="login.php">Log in here</a></p>
+        </div>
     </div>
 </body>
 

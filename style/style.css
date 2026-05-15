@@ -1,4 +1,4 @@
-* {
+*{
   outline: 1px solid red;
 }
 
@@ -20,7 +20,7 @@ body{
     display:grid;
     grid-template-columns: 4fr 3fr;
     gap: 20px;
-    height: 400px;
+    height: 315px;
 }
 
 .kanan-tumpuk{
@@ -31,6 +31,12 @@ body{
 
 .dashboard1{
     background-color: #f5e1c3;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.3); 
+}
+
+.dashboard1 h3, p{
+    padding-left: 20px;
 }
 
 p, h3 {
@@ -65,9 +71,10 @@ p, h3 {
 .login-wrap{
     background-color:#fce7cc;
     width: 500px;
-    height: 340px ;
+    height: 340px auto;
     align-items: center;
     border-radius: 6px;
+    box-shadow: #8888 5px 5px 10px;
 }
 
 .login-wrap input{
@@ -77,13 +84,18 @@ p, h3 {
     max-width: 400px;      
     padding: 10px;         
     border-radius: 10px;  
-    border: 1px solid #ccc; 
+    border: 1px solid #8888; 
     box-sizing: border-box;
+    box-shadow: #8888 5px 5px 10px;
 }
 
 .login-wrap button{
     display: block;
-    margin: 10px auto;
+    margin: auto;
+    padding: 5px 25px;
+    border-radius: 5px;
+    border: none;
+    background-color: #ffff;
 }
 
 .login-wrap h1{
@@ -230,4 +242,30 @@ p, h3 {
     border-radius:50%;
     object-fit:cover;
     border:4px solid #ddd;
+}
+
+.tagihan-container{
+    margin:30px auto;
+}
+
+.tagihan-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px;
+    margin-bottom:15px;
+    background:#f5e1c3;
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+
+.status{
+    padding:5px;
+    border-radius:20px;
+    font-weight:bold;
+}
+
+.unpaid{
+    background:#f5e1c3;
+    color:red;
 }

@@ -1,7 +1,7 @@
 <?php
 include '../koneksi/koneksi.php';
 include 'layout/sidebar.php';
-sidebar('../index.php', 'group.php', '../history.php', '../bills.php', '../auth/logout.php');
+sidebar('../index.php', 'group.php', '../bills.php', '../auth/logout.php', 'akun.php');
 include '../koneksi/session.php';
 autentikasi('../auth/login.php');
 
