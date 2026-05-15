@@ -53,11 +53,21 @@ p, h3 {
 
 .group1{
     background-color: aqua;
+    height: 210px;
+    border-radius: 12px;
 }
 
-.group1 img{
-    width :100%;
-    height: 91%;
+.group1 a{
+    padding-left: 10px;
+    margin-top: 10px;
+}
+.group-img img{
+    width :70%;
+    height: 70%;
+}
+
+.group-img{
+    justify-content: center;
 }
 
 

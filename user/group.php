@@ -27,7 +27,10 @@ $query = mysqli_query($conn, "SELECT groups.id_group, groups.nama_grub FROM grou
         <div class="group1">
             <a name="group" href="isigroup.php?group=<?php echo $row['id_group']; ?>"><?php echo $row['nama_grub']; ?></a>
             <br>
+
+            <div class="group-img">
             <img src="../assets/gambarcontoh.png" alt="Kelas">
+            </div>
         </div>
     <?php } ?>    
     </div>
