@@ -1,4 +1,4 @@
-*{
+{
   outline: 1px solid red;
 }
 
@@ -6,6 +6,7 @@ body{
     background-color:#f2c272;
     margin-left:240px;
     padding-left: 30px;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
 .dashboard-atas{
@@ -49,11 +50,13 @@ p, h3 {
     gap: 20px;
     height: 200px;
     width: 100%;
+    place-items: center;
 }
 
 .group1{
     background-color: aqua;
     height: 210px;
+    width:86%;
     border-radius: 12px;
 }
 
@@ -62,12 +65,15 @@ p, h3 {
     margin-top: 10px;
 }
 .group-img img{
-    width :70%;
-    height: 70%;
+    max-width :100%;
+    max-height: 160px;
+    border-radius: 13px;
 }
 
 .group-img{
+    display: flex;
     justify-content: center;
+    margin-top: 14px;
 }
 
 
@@ -138,36 +144,113 @@ p, h3 {
 .four-dalam{
     display:grid;
     grid-template-rows: repeat(3 , 1fr);
+    gap:20px;
 }
 
 .two-tengah{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
+    gap:20px;
 }
 
 .bawah-aktivitas{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
+    gap:20px;
+    height: 169px;
 }
 
 .wrap-isigrub{
     display:grid;
     grid-template-columns: 3fr 1fr;
+    gap:20px;
 }
 
-.sidebar {
-  width: 220px;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  background: #f5d6a0;
-  padding: 20px;
+.two-tengah{
+    gap:20px;
+}
+
+.sidebar{
+    width:220px;
+    height:100vh;
+    position:fixed;
+    left:0;
+    top:0;
+
+    background:#f5d6a0;
+
+    padding:20px 18px;
+    box-sizing:border-box;
+
+    display:flex;
+    flex-direction:column;
+}
+
+/* logo */
+.logo{
+    display:flex;
+    justify-content:center;
+    margin-bottom:30px;
+}
+
+.logo h2{
+    background:#f2be63;
+    padding:10px 25px;
+    border-radius:10px;
+
+    color:#2d6a4f;
+    font-size:24px;
+    font-weight:bold;
+}
+
+/* menu */
+.menu{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+/* item */
+.menu-item{
+    text-decoration:none;
+    color:black;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:12px 15px;
+
+    border-radius:12px;
+
+    transition:0.2s;
+}
+
+/* hover */
+.menu-item:hover{
+    background:#f0c87a;
+}
+
+/* active */
+.menu-item.active{
+    background:#f8e3bb;
+    border:2px solid #7ed6c1;
+
+    font-weight:bold;
+}
+
+
+/* bawah */
+.bottom-menu{
+    margin-top: auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
 }
 
 .main {
   margin-left: 220px;
-  padding: 20px;
+  padding:20px;
 }
 
 .modal {
@@ -267,7 +350,10 @@ p, h3 {
     background:#f5e1c3;
     border-radius:12px;
     box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    text-align: center;
 }
+
+
 
 .status{
     padding:5px;
@@ -278,4 +364,165 @@ p, h3 {
 .unpaid{
     background:#f5e1c3;
     color:red;
+}
+
+.tagihan-itemmini{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.statusnya{
+    border-radius:8px;
+    font-weight:bold;
+    margin-right: 6px;
+}
+
+.unpaidnya{
+    background:#f5e1c3;
+    color:red;
+}
+
+.atas-saldo{
+    background-color: #f5e1c3;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.3); 
+}
+
+.atas-saldo h4{
+    font-size:30px;
+    margin-bottom:10px;
+    margin:0;
+}
+
+.atas-saldo p{
+    font-size:48px;
+    font-weight:bold;
+    margin:0;
+    padding-bottom: 45px;
+}
+
+.pemasukan{
+    background-color: #f5e1c3;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.3); 
+}
+
+.pengeluaran{
+    background-color: #f5e1c3;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.3); 
+}
+
+.pemasukan h4,
+.pengeluaran h4{
+    margin-top:0;
+    font-size:28px;
+}
+
+.pemasukan p,
+.pengeluaran p{
+    font-size:40px;
+    margin:10px 0 20px;
+    font-weight:bold;
+}
+
+.pemasukan p{
+    color:#4CD964;
+}
+
+.pengeluaran p{
+    color:#FF3B30;
+}
+
+.bawah-grafik{
+    background-color: #f5e1c3;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.3); 
+}
+
+.bawah-pembelian{
+    background-color: #f5e1c3;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+    font-size:18px; 
+}
+
+
+.list-member{
+    background-color: #f5e1c3;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+}
+
+select{
+    padding:8px 12px;
+
+    border:none;
+    border-radius:10px;
+
+    background:#fff;
+}
+
+.list-member{
+    min-height:100%;
+}
+
+.list-member h4{
+    text-align:center;
+    margin-top:0;
+    margin-bottom:20px;
+}
+
+.member-item{
+    background:#FFFF;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    margin-bottom:4px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.member-item small{
+    color:#666;
+}
+
+button{
+    border:none;
+
+    background:#ffff;
+    color:#1f1f1f;
+
+    padding:10px 16px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:0.2s;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.bawah-grafik{
+    margin-top:20px;
+
+    height:200px;
+
+    border-radius:15px;
+
+    background:#E8D4B4;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    color:#1f1f1f;
 }

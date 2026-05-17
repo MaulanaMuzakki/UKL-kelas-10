@@ -1,7 +1,7 @@
 <?php
 include '../koneksi/koneksi.php';
 include 'layout/sidebar.php';
-SideBar('../index.php', 'group.php', '../bills.php', '../auth/logout.php', 'akun.php');
+SideBar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php','group');
 include '../koneksi/session.php';
 autentikasi('../auth/login.php');
 $user_id = $_SESSION['id_user'];

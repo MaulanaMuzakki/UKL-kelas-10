@@ -1,4 +1,4 @@
-<?php function sidebar($dashboard, $group, $bills, $logout, $profil) { ?>
+<?php function sidebar($dashboard, $group, $bills, $logout, $profil, $active) { ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,22 +8,47 @@
     <link rel="stylesheet" href="../../style/style.css">
 </head>
 <body>
-<div class="sidebar">
-    <h2>Kas App</h2>
-    
-    <ul>
-        <li><a href="<?= $dashboard ?>">Dashboard</a></li>
-        <li><a href="<?= $group ?>">Group</a></li>
-        <li><a href="<?= $bills ?>">Tagihan</a></li>
-    </ul>
 
-    <div class="logout">
-        <a href="<?= $logout ?>">Logout</a>
+<div class="sidebar">
+
+    <div class="logo">
+        <h2>DanaKita</h2>
     </div>
-    <div class="profil">
-        <a href="<?= $profil ?>">Profil</a>
+
+    <div class="menu">
+
+        <a href="<?= $dashboard ?>" class="menu-item <?= $active == 'dashboard' ? 'active' : '' ?>">
+            <span>📊</span>
+            Dashboard
+        </a>
+
+        <a href="<?= $group ?>" class="menu-item <?= $active == 'group' ? 'active' : '' ?>">
+            <span>👥</span>
+            Group
+        </a>
+
+        <a href="<?= $bills ?>" class="menu-item <?= $active == 'bills' ? 'active' : '' ?>">
+            <span>🧾</span>
+            Bills
+        </a>
+
     </div>
+
+    <div class="bottom-menu">
+
+        <a href="<?= $profil ?>" class="menu-item <?= $active == 'profil' ? 'active' : '' ?>">
+            <span>⚙️</span>
+            Account
+        </a>
+
+        <a href="<?= $logout ?>" class="menu-item">
+            <span>↩️</span>
+            Log out
+        </a>
+
+    </div>
+
 </div>
+
 </body>
-</html>
 <?php } ?>

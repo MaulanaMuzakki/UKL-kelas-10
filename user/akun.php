@@ -3,7 +3,7 @@ include '../koneksi/koneksi.php';
 include '../koneksi/session.php';
 autentikasi('../auth/login.php');
 include 'layout/sidebar.php';
-sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php');
+sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'profil');
 
 $user_id = $_SESSION['id_user'];
 

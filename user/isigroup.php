@@ -1,7 +1,7 @@
 <?php
 include '../koneksi/koneksi.php';
 include 'layout/sidebar.php';
-sidebar('../index.php', 'group.php', '../bills.php', '../auth/logout.php', 'akun.php');
+sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'group');
 include '../koneksi/session.php';
 autentikasi('../auth/login.php');
 
@@ -115,6 +115,8 @@ if (isset($_POST['bayar'])) {
     $query = "INSERT INTO transactions (user_id, group_id, amount, description, date, type) VALUES ('$user_id', '$group_id', '$amount', '$description', '$date', '$type')";
 
     mysqli_query($conn, $query);
+    header("Location: isigroup.php?group=$group_id");
+    exit;
 }
 ?>
 
@@ -164,42 +166,42 @@ if (isset($_POST['keluar'])) {
 <body>
     <h1>Group > <?php echo $data_group['nama_grub']; ?></h1>
     <h3>Code Group: <?php echo $code_group; ?></h3>
-    <?php if ($role == 'admin') { ?>
-        <button onclick="openModal()">Catat Pembayaran</button>
-
-        <div id="modalPembayaran" class="modal">
-            <div class="modal-content">
-
-                <span class="close" onclick="closeModal()">&times;</span>
-                <h2>Tambah Pembayaran</h2>
-
-                <form method="POST">
-                    <label>Jumlah</label>
-                    <input type="number" name="amount" required><br>
-
-                    <label>jenis</label>
-                    <select name="type" required>
-                        <option value="income">Pemasukan</option>
-                        <option value="expense">Pengeluaran</option>
-                    </select><br>
-
-                    <label>Keterangan</label>
-                    <input type="text" name="description"><br>
-
-                    <label>Tanggal</label>
-                    <input type="date" name="date" required><br>
-
-                    <button name="bayar" type="submit">Simpan</button>
-                </form>
-
-            </div>
-        </div>
-    <?php } ?>
     <div class="wrap-isigrub">
         <div class="four-dalam">
-            <div class="atas-saldo">
+            <div class="atas-saldo">               
                 <h4>Saldo</h4>
                 <p>Rp <?php echo number_format($saldo); ?></p>
+                <?php if ($role == 'admin') { ?>
+                    <button onclick="openModal()">Catat Pembayaran</button>
+
+                    <div id="modalPembayaran" class="modal">
+                        <div class="modal-content">
+
+                            <span class="close" onclick="closeModal()">&times;</span>
+                            <h2>Tambah Pembayaran</h2>
+
+                            <form method="POST">
+                                <label>Jumlah</label>
+                                <input type="number" name="amount" required><br>
+
+                                <label>jenis</label>
+                                <select name="type" required>
+                                    <option value="income">Pemasukan</option>
+                                    <option value="expense">Pengeluaran</option>
+                                </select><br>
+
+                                <label>Keterangan</label>
+                                <input type="text" name="description"><br>
+
+                                <label>Tanggal</label>
+                                <input type="date" name="date" required><br>
+
+                                <button name="bayar" type="submit">Simpan</button>
+                            </form>
+
+                        </div>
+                    </div>
+                <?php } ?> 
             </div>
             <div class="two-tengah">
                 <div class="pemasukan">
@@ -209,11 +211,11 @@ if (isset($_POST['keluar'])) {
                         <input type="hidden" name="group" value="<?php echo $group_id; ?>">
                         <select name="range" onchange="this.form.submit()">
                             <option value="week" <?php if (($range) == 'week')
-                                echo 'selected'; ?>>7 Hari</option>
+                                echo 'selected'; ?>>7 Hari terakhir</option>
                             <option value="month" <?php if (($range) == 'month')
-                                echo 'selected'; ?>>30 Hari</option>
+                                echo 'selected'; ?>>30 Hari terakhir</option>
                             <option value="year" <?php if (($range) == 'year')
-                                echo 'selected'; ?>>1 Tahun</option>
+                                echo 'selected'; ?>>1 Tahun terakhir</option>
                         </select>
                     </form>
                 </div>
@@ -225,11 +227,11 @@ if (isset($_POST['keluar'])) {
 
                         <select name="range" onchange="this.form.submit()">
                             <option value="week" <?php if (($range) == 'week')
-                                echo 'selected'; ?>>7 Hari</option>
+                                echo 'selected'; ?>>7 Hari terakhir</option>
                             <option value="month" <?php if (($range) == 'month')
-                                echo 'selected'; ?>>30 Hari</option>
+                                echo 'selected'; ?>>30 Hari terakhir</option>
                             <option value="year" <?php if (($range) == 'year')
-                                echo 'selected'; ?>>1 Tahun</option>
+                                echo 'selected'; ?>>1 Tahun terakhir</option>
                         </select>
                     </form>
                 </div>
@@ -252,7 +254,7 @@ if (isset($_POST['keluar'])) {
             <h4>Anggota</h4>
             <form method="POST" action="">
                 <input type="hidden" name="group_id" value="group_id">
-                <button type="submit" name="keluar">Keluar Grup</button>
+                <button type="submit" name="keluar" style="margin-bottom: 10px;">Keluar Grup</button>
             </form>
             <?php while ($row = mysqli_fetch_assoc($query_member)) { ?>
 
