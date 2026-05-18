@@ -31,31 +31,31 @@ $data_group = mysqli_fetch_assoc($query_group);
 </head>
 <body>
     <div class="account-container">
-        <a href="../index.php" class="back-link">Kembali ke Home</a>
+    
         <h2>Informasi Akun</h2>
 
-    <div class="profile-image">
-        <img src="../assets/user.png" alt="Profile">
-    </div>
+        <div class="profile-image">
+            <img src="../assets/user.png" alt="Profile">
+        </div>
 
-    <div class="info-item">
-        <span>Username</span>
-        <strong><?= $user['username'] ?></strong>
-    </div>
+        <div class="info-item">
+            <span>Username</span>
+            <strong><?= $user['username'] ?></strong>
+        </div>
 
-    <div class="info-item">
-        <span>ID User</span>
-        <strong><?= $user['id_user'] ?></strong>
-    </div>
+        <div class="info-item">
+            <span>ID User</span>
+            <strong><?= $user['id_user'] ?></strong>
+        </div>
 
-    <div class="info-item">
-        <span>Akun Dibuat</span>
-        <strong><?= $user['created_at'] ?></strong>
-    </div>
+        <div class="info-item">
+            <span>Akun Dibuat</span>
+            <strong><?= $user['created_at'] ?></strong>
+        </div>
 
-    <div class="info-item">
-        <span>Jumlah Grup</span>
-        <strong><?= $data_group['total_group'] ?></strong>
+        <div class="info-item">
+            <span>Jumlah Grup</span>
+            <strong><?= $data_group['total_group'] ?></strong>
+        </div>
     </div>
 </body>
-</div>

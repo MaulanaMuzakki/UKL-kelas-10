@@ -1,7 +1,7 @@
 <?php
 include 'koneksi/koneksi.php';
 include 'user/layout/sidebar.php';
-sidebar('dashboard.php', 'user/group.php', 'user/tagihan.php', 'auth/logout.php', 'user/akun.php', 'dashboard');
+sidebar('index.php', 'user/group.php', 'user/tagihan.php', 'auth/logout.php', 'user/akun.php', 'dashboard');
 include 'koneksi/session.php';
 autentikasi('auth/login.php');
 ?>
@@ -43,6 +43,40 @@ WHERE member.id_user = $user_id
 ");
 ?>
 
+<?php
+
+$query_pembayaran = mysqli_query($conn, "SELECT 
+transactions.amount,
+transactions.date,
+groups.nama_grub
+FROM transactions
+JOIN groups ON transactions.group_id = groups.id_group
+WHERE transactions.user_id = $user_id
+AND transactions.type = 'income'
+ORDER BY transactions.date DESC
+LIMIT 3
+");
+
+?>
+
+<?php
+
+$query_pengeluaran_dashboard = mysqli_query($conn, "SELECT
+transactions.description,
+transactions.amount,
+transactions.date,
+groups.nama_grub
+FROM transactions
+JOIN groups ON transactions.group_id = groups.id_group
+JOIN member ON groups.id_group = member.id_group
+WHERE member.id_user = $user_id
+AND transactions.type = 'expense'
+ORDER BY transactions.date DESC
+LIMIT 3
+");
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,11 +91,11 @@ WHERE member.id_user = $user_id
         <div class="dashboard-atas">
             <div class="dashboard1">
                 <h3>Total Saldo</h3>
-                <p><h1>Rp<?= number_format($data_saldo['saldo'] ?? 0, 0, ',', '.') ?></h1></p>
+                <h1 style="color: green;">Rp<?= number_format($data_saldo['saldo'] ?? 0, 0, ',', '.') ?></h1>
             </div>
             <div class="dashboard1">
                 <h3>Pembayaran bulan ini</h3>
-                <p><h1>Rp<?= number_format($data_bayar['total'] ?? 0, 0, ',', '.') ?></h1></p>
+                <h1 style="color: red;">Rp<?= number_format($data_bayar['total'] ?? 0, 0, ',', '.') ?></h1>
             </div>
             <div class="dashboard1">
                 <h3>Tagihan Aktif</h3>
@@ -118,20 +152,60 @@ WHERE member.id_user = $user_id
         <br>
 
         <div class="dashboard-bawah">
-            <div class="dashboard1">
-                <h3>Grafik</h3>
-                <p>....</p>
-            </div>
-            <div class="kanan-tumpuk">
                 <div class="dashboard1">
                     <h3>Pembayaran terakhir</h3>
-                    <p>....</p>
+                    <?php while($row = mysqli_fetch_assoc($query_pembayaran)) { ?>
+
+                        <div class="dashboard-item">
+
+                            <div class="item-left">
+
+                                <h4><?= $row['nama_grub'] ?></h4>
+
+                                <p>
+                                    Rp <?= number_format($row['amount']) ?>
+                                </p>
+
+                            </div>
+
+                            <div class="item-right">
+
+                                <?= date('d M Y', strtotime($row['date'])) ?>
+
+                            </div>
+
+                        </div>
+
+                    <?php } ?>
                 </div>
                 <div class="dashboard1">
                     <h3>pengeluaran grub terbaru</h3>
-                    <p>....</p>
+                    <?php while($row = mysqli_fetch_assoc($query_pengeluaran_dashboard)) { ?>
+
+                    <div class="dashboard-item">
+
+                        <div class="item-left">
+
+                            <h4><?= $row['description'] ?></h4>
+
+                            <p>
+                                <?= $row['nama_grub'] ?>
+                                •
+                                Rp <?= number_format($row['amount']) ?>
+                            </p>
+
+                        </div>
+
+                        <div class="item-right">
+
+                            <?= date('d M Y', strtotime($row['date'])) ?>
+
+                        </div>
+
+                    </div>
+
+                    <?php } ?>
                 </div>
-            </div>
         </div>
     </div>
 </body>

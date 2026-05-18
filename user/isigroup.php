@@ -105,8 +105,17 @@ $role = $data_role['role'] ?? '';
 ?>
 
 <?php
+$query_member_select = mysqli_query($conn, "SELECT users.id_user, users.username
+FROM users
+JOIN member ON users.id_user = member.id_user
+WHERE member.id_group = $group_id
+");
+?>
+
+<?php
 if (isset($_POST['bayar'])) {
-    $user_id = $_SESSION['id_user'];
+    print_r($_POST);
+    $user_id = $_POST['user_id'];
     $amount = $_POST['amount'];
     $description = $_POST['description'];
     $date = $_POST['date'];
@@ -117,6 +126,7 @@ if (isset($_POST['bayar'])) {
     mysqli_query($conn, $query);
     header("Location: isigroup.php?group=$group_id");
     exit;
+
 }
 ?>
 
@@ -129,6 +139,45 @@ if (isset($_POST['keluar'])) {
 
     header("Location: group.php");
     exit;
+}
+?>
+
+<?php
+
+$income_data = [];
+$expense_data = [];
+$labels = [];
+
+for($i = 29; $i >= 0; $i--){
+
+    $tanggal = date('Y-m-d', strtotime("-$i days"));
+
+    $labels[] = date('d M', strtotime($tanggal));
+
+    // pemasukan
+    $income_query = mysqli_query($conn, "SELECT SUM(amount) as total
+    FROM transactions
+    WHERE group_id = $group_id
+    AND type = 'income'
+    AND DATE(date) = '$tanggal'
+    ");
+
+    $income = mysqli_fetch_assoc($income_query);
+
+    $income_data[] = $income['total'] ?? 0;
+
+
+    // pengeluaran
+    $expense_query = mysqli_query($conn, "SELECT SUM(amount) as total
+    FROM transactions
+    WHERE group_id = $group_id
+    AND type = 'expense'
+    AND DATE(date) = '$tanggal'
+    ");
+
+    $expense = mysqli_fetch_assoc($expense_query);
+
+    $expense_data[] = $expense['total'] ?? 0;
 }
 ?>
 
@@ -161,6 +210,8 @@ if (isset($_POST['keluar'])) {
             }
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
 </head>
 
 <body>
@@ -179,8 +230,22 @@ if (isset($_POST['keluar'])) {
 
                             <span class="close" onclick="closeModal()">&times;</span>
                             <h2>Tambah Pembayaran</h2>
-
+                            <label>Member</label>
                             <form method="POST">
+                            <select name="user_id" required>
+
+                                <?php while($member = mysqli_fetch_assoc($query_member_select)) { ?>
+
+                                    <option value="<?= $member['id_user'] ?>">
+                                        <?= $member['username'] ?>
+                                    </option>
+
+                                <?php } ?>
+
+                            </select>
+
+                            <br>
+
                                 <label>Jumlah</label>
                                 <input type="number" name="amount" required><br>
 
@@ -239,14 +304,30 @@ if (isset($_POST['keluar'])) {
             <div class="bawah-aktivitas">
                 <div class="bawah-grafik">
                     <h4>Grafik</h4>
-                    <p>....</p>
+                    <div class="chart-container">
+                        <canvas id="financeChart"></canvas>
+                    </div>
                 </div>
                 <div class="bawah-pembelian">
                     <h4>pembelian</h4>
-                    <p><?php while ($row = mysqli_fetch_assoc($query_pengeluaran)) {
-                        echo $row['description'] . ' - Rp ' . number_format($row['amount']) . '<br>';
-                    } ?>
-                    </p>
+                    <div class="list-pembelian">
+                        <?php while ($row = mysqli_fetch_assoc($query_pengeluaran)) {?>
+                            <div class="pembelian-item">
+
+                                <div class="left">
+                                    <?= $row['description'] ?>
+                                    -
+                                    Rp <?= number_format($row['amount']) ?>
+                                </div>
+
+                                <div class="right">
+                                    <?= $row['date'] ?>
+                                </div>
+
+                            </div>
+
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -283,7 +364,7 @@ if (isset($_POST['keluar'])) {
                             <input type="hidden" name="kick_group" value="<?= $group_id ?>">
 
                             <button type="submit" name="kick_member" class="kick-btn"
-                                onclick="return confirm('Keluarkan member ini?')">
+                                onclick="return confirm('Keluarkan member ini?')" style="background:#ff2c2c; color:#ffff;">
                                 Kick
                             </button>
 
@@ -296,6 +377,107 @@ if (isset($_POST['keluar'])) {
             <?php } ?>
         </div>
     </div>
+     <script>
+
+        const incomeData = <?= json_encode($income_data) ?>;
+        const expenseData = <?= json_encode($expense_data) ?>;
+
+        const ctx = document.getElementById('financeChart');
+
+        new Chart(ctx, {
+
+            type:'line',
+
+            data:{
+
+                labels: <?= json_encode($labels) ?>,
+
+                datasets:[
+
+                    {
+                        label:'Pengeluaran',
+
+                        data:expenseData,
+
+                        borderColor:'#FF3B30',
+
+                        backgroundColor:'transparent',
+
+                        borderWidth:2,
+
+                        tension:0,
+
+                        pointRadius:0
+                    },
+
+                    {
+                        label:'Pemasukan',
+
+                        data:incomeData,
+
+                        borderColor:'#39D353',
+
+                        backgroundColor:'transparent',
+
+                        borderWidth:2,
+
+                        tension:0,
+
+                        pointRadius:0
+                    }
+
+                ]
+            },
+
+            options:{
+
+                responsive:true,
+
+                maintainAspectRatio:false,
+
+                plugins:{
+
+                    legend:{
+
+                        position:'bottom',
+
+                        labels:{
+
+                            usePointStyle:true,
+
+                            pointStyle:'circle',
+
+                            padding:30,
+
+                            font:{
+                                size:16
+                            }
+                        }
+                    }
+                },
+
+                scales:{
+
+                    x:{
+                        display:false,
+
+                        grid:{
+                            display:false
+                        }
+                    },
+
+                    y:{
+                        display:false,
+
+                        grid:{
+                            display:false
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
 </body>
 
 </html>

@@ -12,7 +12,9 @@
 <div class="sidebar">
 
     <div class="logo">
-        <h2>DanaKita</h2>
+        <a href="<?= $dashboard ?>" style="text-decoration: none;">
+            <h2>DanaKita</h2>
+        </a>
     </div>
 
     <div class="menu">

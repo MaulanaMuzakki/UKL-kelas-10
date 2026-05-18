@@ -20,7 +20,7 @@ $query = mysqli_query($conn, "SELECT groups.id_group, groups.nama_grub FROM grou
 <body>
     <div class="atasan-group">
         <h1>Group</h1>
-        <h3 class="tambah-grub"><a href="../admin/tambahgroup.php">Tambah Group</a></h3>
+        <h3 class="tambah-grub"><a href="tambahgroup.php" style=" background-color:#f5e1c3; padding: 8px; text-decoration: none; font-weight: 700; color:black; border-radius:11px;">+ Tambah Group</a></h3>
     </div>
     <div class="outer">
     <?php while($row = mysqli_fetch_assoc($query)) { ?>
@@ -29,7 +29,7 @@ $query = mysqli_query($conn, "SELECT groups.id_group, groups.nama_grub FROM grou
             <br>
 
             <div class="group-img">
-            <img src="../assets/gambarcontoh.png" alt="Kelas">
+            <img src="../assets/grub4.jpg" alt="Kelas">
             </div>
         </div>
     <?php } ?>    

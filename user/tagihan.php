@@ -1,6 +1,9 @@
 <?php
 include '../koneksi/koneksi.php';
 include '../koneksi/session.php';
+autentikasi('../auth/login.php');
+include 'layout/sidebar.php';
+sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'bills');
 
 $user_id = $_SESSION['id_user'];
 
@@ -13,7 +16,7 @@ WHERE member.id_user = $user_id
 <link rel="stylesheet" href="../style/style.css">
 <div class="tagihan-container">
 
-    <h2>Tagihan Saya</h2>
+    <h1>Tagihan Saya</h1>
 
     <?php while($group = mysqli_fetch_assoc($query_group)) { ?>
 
@@ -32,6 +35,7 @@ WHERE member.id_user = $user_id
 
         ?>
 
+        <?php $total_tagihan = 0; ?>    
         <?php if(!$sudah_bayar) { ?>
 
             <div class="tagihan-item">
@@ -50,9 +54,16 @@ WHERE member.id_user = $user_id
                 </div>
 
             </div>
+            <?php $total_tagihan++; ?>
 
-        <?php } ?>
+        <?php } ?> 
 
+    <?php } ?>
+    
+    <?php if($total_tagihan == 0) { ?>
+        <div class="kosong">
+           <h2>Semua tagihan bulan ini sudah dibayar</h2>
+        </div>
     <?php } ?>
 
 </div>
