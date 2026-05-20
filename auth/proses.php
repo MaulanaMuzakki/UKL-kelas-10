@@ -43,7 +43,8 @@ if (isset($_POST['register'])) {
     $hash_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $password = $hash_password;
 
-    $sql = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
+    $sql = "INSERT INTO users (username, email, password)
+             VALUES ('$username', '$email', '$password')";
     if (mysqli_query($conn, $sql)) {
         header("Location: login.php");
         exit();

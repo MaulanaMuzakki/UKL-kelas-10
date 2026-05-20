@@ -1,4 +1,4 @@
-<?php function sidebar($dashboard, $group, $bills, $logout, $profil, $active) { ?>
+<?php function sidebar($dashboard, $group, $bills, $logout, $profil, $active, $dashboard_icon, $group_icon, $bills_icon, $profil_icon, $logout_icon) { ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,17 +20,17 @@
     <div class="menu">
 
         <a href="<?= $dashboard ?>" class="menu-item <?= $active == 'dashboard' ? 'active' : '' ?>">
-            <span>📊</span>
+            <span><img src= <?= $dashboard_icon ?>></span>
             Dashboard
         </a>
 
         <a href="<?= $group ?>" class="menu-item <?= $active == 'group' ? 'active' : '' ?>">
-            <span>👥</span>
+            <span><img src= <?= $group_icon ?>></span>
             Group
         </a>
 
         <a href="<?= $bills ?>" class="menu-item <?= $active == 'bills' ? 'active' : '' ?>">
-            <span>🧾</span>
+            <span><img src= <?= $bills_icon ?>></span>
             Bills
         </a>
 
@@ -39,12 +39,12 @@
     <div class="bottom-menu">
 
         <a href="<?= $profil ?>" class="menu-item <?= $active == 'profil' ? 'active' : '' ?>">
-            <span>⚙️</span>
+            <span><img src= <?= $profil_icon ?>></span>
             Account
         </a>
 
         <a href="<?= $logout ?>" class="menu-item">
-            <span>↩️</span>
+            <span><img src= <?= $logout_icon ?>></span>
             Log out
         </a>
 
@@ -53,4 +53,5 @@
 </div>
 
 </body>
+</html>
 <?php } ?>

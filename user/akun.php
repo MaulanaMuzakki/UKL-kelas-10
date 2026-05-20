@@ -3,7 +3,6 @@ include '../koneksi/koneksi.php';
 include '../koneksi/session.php';
 autentikasi('../auth/login.php');
 include 'layout/sidebar.php';
-sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'profil');
 
 $user_id = $_SESSION['id_user'];
 
@@ -30,32 +29,42 @@ $data_group = mysqli_fetch_assoc($query_group);
     <link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
-    <div class="account-container">
-    
-        <h2>Informasi Akun</h2>
+    <div class="layout">
+        <?php
+            sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'profil', '../assets/chart-2.png', '../assets/people.png', '../assets/card-pos.png', '../assets/person.png', '../assets/logout.png');
+        ?>
+        <div class="main-content">
+            <div class="account-container">
+            
+                <h2>Informasi Akun</h2>
 
-        <div class="profile-image">
-            <img src="../assets/user.png" alt="Profile">
-        </div>
+                <div class="profile-image">
+                    <img src="../assets/user.png" alt="Profile">
+                </div>
 
-        <div class="info-item">
-            <span>Username</span>
-            <strong><?= $user['username'] ?></strong>
-        </div>
+                <div class="info-item">
+                    <span>Username</span>
+                    <strong><?= $user['username'] ?></strong>
+                </div>
 
-        <div class="info-item">
-            <span>ID User</span>
-            <strong><?= $user['id_user'] ?></strong>
-        </div>
+                <div class="info-item">
+                    <span>ID User</span>
+                    <strong><?= $user['id_user'] ?></strong>
+                </div>
 
-        <div class="info-item">
-            <span>Akun Dibuat</span>
-            <strong><?= $user['created_at'] ?></strong>
-        </div>
+                <div class="info-item">
+                    <span>Akun Dibuat</span>
+                    <strong><?= $user['created_at'] ?></strong>
+                </div>
 
-        <div class="info-item">
-            <span>Jumlah Grup</span>
-            <strong><?= $data_group['total_group'] ?></strong>
+                <div class="info-item">
+                    <span>Jumlah Grup</span>
+                    <strong><?= $data_group['total_group'] ?></strong>
+                </div>
+            </div>
         </div>
     </div>
+    <footer class="footer">
+        © 2026 DanaKita. All rights reserved.
+    </footer> 
 </body>

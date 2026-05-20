@@ -3,7 +3,6 @@ include '../koneksi/koneksi.php';
 include '../koneksi/session.php';
 autentikasi('login.php');
 include 'layout/sidebar.php';
-sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'group');
 
 $user_id = $_SESSION['id_user'];
 
@@ -70,59 +69,69 @@ if(isset($_POST['join'])) {
     <link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
-<div class="group-page">
+    <div class="layout">
+        <?php
+            sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'group', '../assets/chart-2.png', '../assets/people.png', '../assets/card-pos.png', '../assets/person.png', '../assets/logout.png');
+        ?>
+        <div class="main-content">
+            <div class="group-page">
 
-    <h1>Group</h1>
+                <h1>Group</h1>
 
-    <div class="group-grid">
+                <div class="group-grid">
 
-        <!-- tambah group -->
-        <div class="group-card">
+                    <!-- tambah group -->
+                    <div class="group-card">
 
-            <h2>Buat Grup Baru</h2>
+                        <h2>Buat Grup Baru</h2>
 
-            <form method="POST">
+                        <form method="POST">
 
-                <input 
-                    type="text"
-                    name="nama_grub"
-                    placeholder="Nama Grup"
-                    required
-                >
+                            <input 
+                                type="text"
+                                name="nama_grub"
+                                placeholder="Nama Grup"
+                                required
+                            >
 
-                <button type="submit" name="create">
-                    Buat Grup
-                </button>
+                            <button type="submit" name="create">
+                                Buat Grup
+                            </button>
 
-            </form>
+                        </form>
 
-        </div>
+                    </div>
 
-        <!-- join group -->
-        <div class="group-card">
+                    <!-- join group -->
+                    <div class="group-card">
 
-            <h2>Gabung Grup</h2>
+                        <h2>Gabung Grup</h2>
 
-            <form method="POST">
+                        <form method="POST">
 
-                <input
-                    type="text"
-                    name="group_code"
-                    placeholder="Masukkan kode grup"
-                    required
-                >
+                            <input
+                                type="text"
+                                name="group_code"
+                                placeholder="Masukkan kode grup"
+                                required
+                            >
 
-                <button type="submit" name="join">
-                    Gabung
-                </button>
+                            <button type="submit" name="join">
+                                Gabung
+                            </button>
 
-            </form>
+                        </form>
 
-        </div>
+                    </div>
 
+                </div>
+
+            </div>
+        </div>    
     </div>
-
-</div>
+    <footer class="footer">
+        © 2026 DanaKita. All rights reserved.
+    </footer>     
 </body>
 </html>
 

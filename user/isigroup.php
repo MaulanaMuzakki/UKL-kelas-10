@@ -1,7 +1,6 @@
 <?php
 include '../koneksi/koneksi.php';
 include 'layout/sidebar.php';
-sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'group');
 include '../koneksi/session.php';
 autentikasi('../auth/login.php');
 
@@ -78,6 +77,79 @@ $saldo = $data_saldo['saldo'] ?? 0;
 ?>
 
 <?php
+if(isset($_POST['save_payment_setting'])){
+
+    $payment_amount = $_POST['payment_amount'];
+
+    $payment_period = $_POST['payment_period'];
+
+
+    mysqli_query($conn, "UPDATE groups
+        SET
+        payment_amount = '$payment_amount',
+        payment_period = '$payment_period'
+        WHERE id_group = '$group_id'
+    ");
+
+
+    $query_period = mysqli_query($conn, "SELECT *
+        FROM payment_periods
+
+        WHERE group_id = '$group_id'
+
+    ");
+
+
+    if(mysqli_num_rows($query_period) == 0){
+
+        $start_date = date('Y-m-d');
+
+        // weekly
+        if($payment_period == 'weekly'){
+
+            $end_date = date(
+                'Y-m-d',
+                strtotime('+7 days')
+            );
+
+        }else{
+
+            // monthly
+            $end_date = date(
+                'Y-m-d',
+                strtotime('+30 days')
+            );
+        }
+
+        // insert periode pertama
+        mysqli_query($conn, "INSERT INTO payment_periods(group_id,
+                period_type,
+                start_date,
+                end_date,
+                payment_amount
+
+            )
+
+            VALUES(
+
+                '$group_id',
+                '$payment_period',
+                '$start_date',
+                '$end_date',
+                '$payment_amount'
+
+            )
+
+        ");
+    }
+
+    header("Location:isigroup.php?group=$group_id");
+    exit;
+
+}
+?>
+
+<?php
 $query_pengeluaran = mysqli_query($conn, "SELECT amount, description, date FROM transactions WHERE group_id = $group_id AND type = 'expense' ORDER BY date DESC LIMIT 5
 ");
 ?>
@@ -125,6 +197,9 @@ if (isset($_POST['bayar'])) {
 
     mysqli_query($conn, $query);
     header("Location: isigroup.php?group=$group_id");
+
+
+    
     exit;
 
 }
@@ -138,6 +213,30 @@ if (isset($_POST['keluar'])) {
     WHERE id_user = '$user_id' AND id_group = '$group_id'");
 
     header("Location: group.php");
+    exit;
+}
+?>
+
+<?php
+    if(isset($_POST['make_admin'])){
+
+    $new_admin = $_POST['new_admin'];
+
+    // turunkan admin lama
+    mysqli_query($conn, "UPDATE member 
+        SET role='member'
+        WHERE id_group = $group_id
+        AND role='admin'
+    ");
+
+    // jadikan admin baru
+    mysqli_query($conn, "UPDATE member
+        SET role='admin'
+        WHERE id_group = $group_id
+        AND id_user = $new_admin
+    ");
+
+    header("Location:isigroup.php?group=$group_id");
     exit;
 }
 ?>
@@ -215,269 +314,410 @@ for($i = 29; $i >= 0; $i--){
 </head>
 
 <body>
-    <h1>Group > <?php echo $data_group['nama_grub']; ?></h1>
-    <h3>Code Group: <?php echo $code_group; ?></h3>
-    <div class="wrap-isigrub">
-        <div class="four-dalam">
-            <div class="atas-saldo">               
-                <h4>Saldo</h4>
-                <p>Rp <?php echo number_format($saldo); ?></p>
-                <?php if ($role == 'admin') { ?>
-                    <button onclick="openModal()">Catat Pembayaran</button>
+    <div class="layout">
+        <?php
+            sidebar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php', 'group', '../assets/chart-2.png', '../assets/people.png', '../assets/card-pos.png', '../assets/person.png', '../assets/logout.png');
+        ?>
+        <div class="main-content">
+            <h1 style="margin-bottom: 3px;">Group > <?php echo $data_group['nama_grub']; ?></h1>
+            <h3>Code Group: <?php echo $code_group; ?></h3>
+            <div class="wrap-isigrub">
+                <div class="four-dalam">
+                    <div class="atas-saldo">
+                        <div class="saldo-flex">
 
-                    <div id="modalPembayaran" class="modal">
-                        <div class="modal-content">
+                            <!-- kiri -->
+                            <div class="saldo-kiri">
 
-                            <span class="close" onclick="closeModal()">&times;</span>
-                            <h2>Tambah Pembayaran</h2>
-                            <label>Member</label>
-                            <form method="POST">
-                            <select name="user_id" required>
+                                <h1>Saldo</h1>
 
-                                <?php while($member = mysqli_fetch_assoc($query_member_select)) { ?>
+                                <h2>
+                                    Rp <?= number_format($saldo) ?>
+                                </h2>
 
-                                    <option value="<?= $member['id_user'] ?>">
-                                        <?= $member['username'] ?>
-                                    </option>
+                                <?php if ($role == 'admin') { ?>
+                                    <button class="btn-dark" onclick="openModal()">Catat Pembayaran</button>
+                                        <div id="modalPembayaran" class="modal">
+                                            <div class="modal-content">
+                                                <span class="close" onclick="closeModal()">&times;</span>
+                                                <h2>Tambah Pembayaran</h2>
+                                                <label>Member</label>
+                                                <form method="POST">
+                                                    <div class="form-group">
+                                                        <select name="user_id" required>
+
+                                                            <?php while($member = mysqli_fetch_assoc($query_member_select)) { ?>
+
+                                                                <option value="<?= $member['id_user'] ?>">
+                                                                        <?= $member['username'] ?>
+                                                                </option>
+
+                                                            <?php } ?>
+
+                                                        </select>
+                                                    </div>
+                                                    <br>
+                                                    <div class="form-group">
+                                                        <label>Jumlah</label>
+                                                        <input type="number" name="amount" required>
+                                                    </div>
+                                                    <br>
+
+                                                    <div class="form-group">
+                                                        <label>jenis</label>
+                                                        <select name="type" required>
+                                                            <option value="income">Pemasukan</option>
+                                                            <option value="expense">Pengeluaran</option>
+                                                        </select>
+                                                    </div><br>
+
+                                                    <div class="form-group">
+                                                        <label>Keterangan</label>
+                                                        <input type="text" name="description">
+                                                    </div><br>
+
+                                                    <div class="form-group">
+                                                        <label>Tanggal</label>
+                                                        <input type="date" name="date" required>
+                                                    </div><br>
+
+                                                    <button name="bayar" type="submit">Simpan</button>
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                <?php } ?> 
+                            </div>
+
+                            <!-- kanan -->
+                            <div class="aturan-bayar">
+
+                                <h3>Nominal bayar</h3>
+
+                                <h2>
+                                    Rp <?= number_format($data_group['payment_amount'] ?? 0) ?>
+                                    /
+                                    <?= $data_group['payment_period'] == 'weekly' ? 'minggu' : 'bulan' ?>
+                                </h2>
+
+                                <?php if($is_admin) { ?>
+
+                                    <form method="POST" class="form-payment-setting">
+
+                                        <div class="payment-input-row">
+
+                                            <input
+                                                type="number"
+                                                name="payment_amount"
+                                                placeholder="Nominal"
+                                                value="<?= $data_group['payment_amount'] ?? 0 ?>"
+                                                required
+                                            >
+
+                                            <select name="payment_period">
+
+                                                <option
+                                                    value="weekly"
+                                                    <?= ($data_group['payment_period'] == 'weekly') ? 'selected' : '' ?>
+                                                >
+                                                    Mingguan
+                                                </option>
+
+                                                <option
+                                                    value="monthly"
+                                                    <?= ($data_group['payment_period'] == 'monthly') ? 'selected' : '' ?>
+                                                >
+                                                    Bulanan
+                                                </option>
+
+                                            </select>
+
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            name="save_payment_setting"
+                                        >
+                                            Simpan
+                                        </button>
+
+                                    </form>
 
                                 <?php } ?>
 
-                            </select>
-
-                            <br>
-
-                                <label>Jumlah</label>
-                                <input type="number" name="amount" required><br>
-
-                                <label>jenis</label>
-                                <select name="type" required>
-                                    <option value="income">Pemasukan</option>
-                                    <option value="expense">Pengeluaran</option>
-                                </select><br>
-
-                                <label>Keterangan</label>
-                                <input type="text" name="description"><br>
-
-                                <label>Tanggal</label>
-                                <input type="date" name="date" required><br>
-
-                                <button name="bayar" type="submit">Simpan</button>
-                            </form>
+                            </div>
 
                         </div>
                     </div>
-                <?php } ?> 
-            </div>
-            <div class="two-tengah">
-                <div class="pemasukan">
-                    <h4>pemasukan</h4>
-                    <p>Rp <?php echo number_format($data['total_income'] ?? 0); ?></p>
-                    <form method="GET">
-                        <input type="hidden" name="group" value="<?php echo $group_id; ?>">
-                        <select name="range" onchange="this.form.submit()">
-                            <option value="week" <?php if (($range) == 'week')
-                                echo 'selected'; ?>>7 Hari terakhir</option>
-                            <option value="month" <?php if (($range) == 'month')
-                                echo 'selected'; ?>>30 Hari terakhir</option>
-                            <option value="year" <?php if (($range) == 'year')
-                                echo 'selected'; ?>>1 Tahun terakhir</option>
-                        </select>
-                    </form>
-                </div>
-                <div class="pengeluaran">
-                    <h4>pengeluaran</h4>
-                    <p>Rp <?php echo number_format($data['total_expense'] ?? 0); ?></p>
-                    <form method="GET">
-                        <input type="hidden" name="group" value="<?php echo $group_id; ?>">
+                    <div class="two-tengah">
+                        <div class="pemasukan">
+                            <h4>pemasukan</h4>
+                            <p>Rp <?php echo number_format($data['total_income'] ?? 0); ?></p>
+                            <form method="GET">
+                                <input type="hidden" name="group" value="<?php echo $group_id; ?>">
+                                <select name="range" onchange="this.form.submit()" style="margin: 0;">
+                                    <option value="week" <?php if (($range) == 'week')
+                                        echo 'selected'; ?>>7 Hari terakhir</option>
+                                    <option value="month" <?php if (($range) == 'month')
+                                        echo 'selected'; ?>>30 Hari terakhir</option>
+                                    <option value="year" <?php if (($range) == 'year')
+                                        echo 'selected'; ?>>1 Tahun terakhir</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="pengeluaran">
+                            <h4>pengeluaran</h4>
+                            <p>Rp <?php echo number_format($data['total_expense'] ?? 0); ?></p>
+                            <form method="GET">
+                                <input type="hidden" name="group" value="<?php echo $group_id; ?>">
 
-                        <select name="range" onchange="this.form.submit()">
-                            <option value="week" <?php if (($range) == 'week')
-                                echo 'selected'; ?>>7 Hari terakhir</option>
-                            <option value="month" <?php if (($range) == 'month')
-                                echo 'selected'; ?>>30 Hari terakhir</option>
-                            <option value="year" <?php if (($range) == 'year')
-                                echo 'selected'; ?>>1 Tahun terakhir</option>
-                        </select>
-                    </form>
-                </div>
-            </div>
-            <div class="bawah-aktivitas">
-                <div class="bawah-grafik">
-                    <h4>Grafik</h4>
-                    <div class="chart-container">
-                        <canvas id="financeChart"></canvas>
+                                <select name="range" onchange="this.form.submit()" style="margin: 0;">
+                                    <option value="week" <?php if (($range) == 'week')
+                                        echo 'selected'; ?>>7 Hari terakhir</option>
+                                    <option value="month" <?php if (($range) == 'month')
+                                        echo 'selected'; ?>>30 Hari terakhir</option>
+                                    <option value="year" <?php if (($range) == 'year')
+                                        echo 'selected'; ?>>1 Tahun terakhir</option>
+                                </select>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div class="bawah-pembelian">
-                    <h4>pembelian</h4>
-                    <div class="list-pembelian">
-                        <?php while ($row = mysqli_fetch_assoc($query_pengeluaran)) {?>
-                            <div class="pembelian-item">
-
-                                <div class="left">
-                                    <?= $row['description'] ?>
-                                    -
-                                    Rp <?= number_format($row['amount']) ?>
-                                </div>
-
-                                <div class="right">
-                                    <?= $row['date'] ?>
-                                </div>
-
+                    <div class="bawah-aktivitas">
+                        <div class="bawah-grafik">
+                            <h4>Grafik</h4>
+                            <div class="chart-container">
+                                <canvas id="financeChart"></canvas>
                             </div>
+                        </div>
+                        <div class="bawah-pembelian">
+                            <h4>pembelian</h4>
+                            <div class="list-pembelian">
+                                <?php while ($row = mysqli_fetch_assoc($query_pengeluaran)) {?>
+                                    <div class="pembelian-item">
 
-                        <?php } ?>
+                                        <div class="left">
+                                            <?= $row['description'] ?>
+                                            -
+                                            Rp <?= number_format($row['amount']) ?>
+                                        </div>
+
+                                        <div class="right">
+                                            <?= $row['date'] ?>
+                                        </div>
+
+                                    </div>
+
+                                <?php } ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="list-member">
-            <h4>Anggota</h4>
-            <form method="POST" action="">
-                <input type="hidden" name="group_id" value="group_id">
-                <button type="submit" name="keluar" style="margin-bottom: 10px;">Keluar Grup</button>
-            </form>
-            <?php while ($row = mysqli_fetch_assoc($query_member)) { ?>
+                <div class="list-member">
+                    <h4>Anggota</h4>
+                    <form method="POST" action="">
+                        <input type="hidden" name="group_id" value="group_id">
+                        <button type="submit" name="keluar" style="margin-bottom: 10px;">Keluar Grup</button>
+                    </form>
+                    <?php while ($row = mysqli_fetch_assoc($query_member)) { ?>
 
-                <div class="member-item">
+                        <div class="member-item">
 
-                    <span>
-                        <?= $row['username'] ?>
+                            <span>
+                                <?= $row['username'] ?>
 
-                        <?php if ($row['role'] == 'admin') { ?>
-                            <small>(Admin)</small>
-                        <?php } ?>
-                    </span>
+                                <?php if ($row['role'] == 'admin') { ?>
+                                    <small>(Admin)</small>
+                                <?php } ?>
+                            </span>
 
-                    <?php
-                    if (
-                        $is_admin &&
-                        $row['id_user'] != $user_id &&
-                        $row['role'] != 'admin'
-                    ) {
-                        ?>
+                            <?php
+                            if (
+                                $is_admin &&
+                                $row['id_user'] != $user_id &&
+                                $row['role'] != 'admin'
+                            ) {
+                                ?>
 
-                        <form method="POST">
+                                <?php
+                                if(
+                                    $is_admin &&
+                                    $row['id_user'] != $user_id
+                                ){
+                                ?>
 
-                            <input type="hidden" name="kick_user" value="<?= $row['id_user'] ?>">
+                                <div class="dropdown">
 
-                            <input type="hidden" name="kick_group" value="<?= $group_id ?>">
+                                    <button class="manage-btn">
+                                        Kelola
+                                    </button>
 
-                            <button type="submit" name="kick_member" class="kick-btn"
-                                onclick="return confirm('Keluarkan member ini?')" style="background:#ff2c2c; color:#ffff;">
-                                Kick
-                            </button>
+                                    <div class="dropdown-content">
 
-                        </form>
+                                        <!-- jadikan admin -->
+                                        <form method="POST">
+
+                                            <input 
+                                                type="hidden"
+                                                name="new_admin"
+                                                value="<?= $row['id_user'] ?>"
+                                            >
+
+                                            <button 
+                                                type="submit"
+                                                name="make_admin"
+                                                class="dropdown-item"
+                                            >
+                                                Jadikan Admin
+                                            </button>
+
+                                        </form>
+
+                                        <!-- kick -->
+                                        <form method="POST">
+
+                                            <input 
+                                                type="hidden"
+                                                name="kick_user"
+                                                value="<?= $row['id_user'] ?>"
+                                            >
+
+                                            <input 
+                                                type="hidden"
+                                                name="kick_group"
+                                                value="<?= $group_id ?>"
+                                            >
+
+                                            <button 
+                                                type="submit"
+                                                name="kick_member"
+                                                class="dropdown-item danger"
+
+                                                onclick="return confirm('Kick member ini?')"
+                                            >
+                                                Kick Member
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                                <?php } ?>
+
+                            <?php } ?>
+
+                        </div>
 
                     <?php } ?>
-
                 </div>
+            </div>
+            <script>
 
-            <?php } ?>
-        </div>
-    </div>
-     <script>
+                const incomeData = <?= json_encode($income_data) ?>;
+                const expenseData = <?= json_encode($expense_data) ?>;
 
-        const incomeData = <?= json_encode($income_data) ?>;
-        const expenseData = <?= json_encode($expense_data) ?>;
+                const ctx = document.getElementById('financeChart');
 
-        const ctx = document.getElementById('financeChart');
+                new Chart(ctx, {
 
-        new Chart(ctx, {
+                    type:'line',
 
-            type:'line',
+                    data:{
 
-            data:{
+                        labels: <?= json_encode($labels) ?>,
 
-                labels: <?= json_encode($labels) ?>,
+                        datasets:[
 
-                datasets:[
+                            {
+                                label:'Pengeluaran',
 
-                    {
-                        label:'Pengeluaran',
+                                data:expenseData,
 
-                        data:expenseData,
+                                borderColor:'#FF3B30',
 
-                        borderColor:'#FF3B30',
+                                backgroundColor:'transparent',
 
-                        backgroundColor:'transparent',
+                                borderWidth:2,
 
-                        borderWidth:2,
+                                tension:0,
 
-                        tension:0,
+                                pointRadius:0
+                            },
 
-                        pointRadius:0
+                            {
+                                label:'Pemasukan',
+
+                                data:incomeData,
+
+                                borderColor:'#39D353',
+
+                                backgroundColor:'transparent',
+
+                                borderWidth:2,
+
+                                tension:0,
+
+                                pointRadius:0
+                            }
+
+                        ]
                     },
 
-                    {
-                        label:'Pemasukan',
+                    options:{
 
-                        data:incomeData,
+                        responsive:true,
 
-                        borderColor:'#39D353',
+                        maintainAspectRatio:false,
 
-                        backgroundColor:'transparent',
+                        plugins:{
 
-                        borderWidth:2,
+                            legend:{
 
-                        tension:0,
+                                position:'bottom',
 
-                        pointRadius:0
-                    }
+                                labels:{
 
-                ]
-            },
+                                    usePointStyle:true,
 
-            options:{
+                                    pointStyle:'circle',
 
-                responsive:true,
+                                    padding:30,
 
-                maintainAspectRatio:false,
+                                    font:{
+                                        size:16
+                                    }
+                                }
+                            }
+                        },
 
-                plugins:{
+                        scales:{
 
-                    legend:{
+                            x:{
+                                display:false,
 
-                        position:'bottom',
+                                grid:{
+                                    display:false
+                                }
+                            },
 
-                        labels:{
+                            y:{
+                                display:false,
 
-                            usePointStyle:true,
-
-                            pointStyle:'circle',
-
-                            padding:30,
-
-                            font:{
-                                size:16
+                                grid:{
+                                    display:false
+                                }
                             }
                         }
                     }
-                },
+                });
 
-                scales:{
-
-                    x:{
-                        display:false,
-
-                        grid:{
-                            display:false
-                        }
-                    },
-
-                    y:{
-                        display:false,
-
-                        grid:{
-                            display:false
-                        }
-                    }
-                }
-            }
-        });
-
-    </script>
+            </script>
+        </div>    
+    </div>
+    <footer class="footer">
+        © 2026 DanaKita. All rights reserved.
+    </footer> 
 </body>
 
 </html>
