@@ -19,7 +19,7 @@ $query = mysqli_query($conn, "SELECT groups.id_group, groups.nama_grub FROM grou
 <body>
     <div class="layout">
         <?php
-            SideBar('../index.php', 'group.php', 'tagihan.php', '../auth/logout.php', 'akun.php','group', '../assets/chart-2.png', '../assets/people.png', '../assets/card-pos.png', '../assets/person.png', '../assets/logout.png');
+            SideBar('../koneksi/koneksi.php','../index.php', 'group.php', 'tagihan.php', 'inbox.php', 'report.php', '../auth/logout.php', 'akun.php','group', '../assets/chart-2.png', '../assets/people.png', '../assets/card-pos.png', '../assets/mail.png', '../assets/clock.png', '../assets/person.png', '../assets/logout.png');
         ?>
         <div class="main-content">
             <div class="atasan-group">

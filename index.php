@@ -33,6 +33,98 @@ AND YEAR(date) = YEAR(CURRENT_DATE())
 ");
 
 $data_bayar = mysqli_fetch_assoc($query_bayar);
+?><?php
+
+$query_masuk = mysqli_query($conn, "SELECT
+SUM(amount) AS total
+FROM transactions
+WHERE type='income'
+AND date >= CURDATE()-INTERVAL 7 DAY
+AND group_id IN(
+SELECT id_group
+FROM member
+WHERE id_user=$user_id
+)
+");
+
+$data_masuk = mysqli_fetch_assoc($query_masuk);
+
+
+
+$query_keluar = mysqli_query($conn, "SELECT
+SUM(amount) AS total
+FROM transactions
+WHERE type='expense'
+AND date >= CURDATE()-INTERVAL 7 DAY
+AND group_id IN(
+SELECT id_group
+FROM member
+WHERE id_user=$user_id
+)
+");
+
+$data_keluar = mysqli_fetch_assoc($query_keluar);
+
+
+
+$query_grup_stat = mysqli_query($conn, "SELECT
+COUNT(*) total,
+SUM(role='admin') admin_total
+
+FROM member
+
+WHERE id_user=$user_id
+");
+
+$data_grup = mysqli_fetch_assoc($query_grup_stat);
+
+
+
+$query_pending = mysqli_query($conn, "SELECT
+COUNT(*) total
+
+FROM notifications
+
+WHERE receiver_id=$user_id
+
+AND type='payment_request'
+");
+
+$data_pending = mysqli_fetch_assoc($query_pending);
+
+?>
+
+<?php
+
+$query_preview = mysqli_query($conn, "SELECT
+
+payment_requests.amount,
+
+users.username
+
+FROM payment_requests
+
+JOIN users
+
+ON users.id_user=
+payment_requests.user_id
+
+JOIN member
+
+ON member.id_group=
+payment_requests.group_id
+
+WHERE
+
+member.id_user=$user_id
+
+AND member.role='admin'
+
+AND payment_requests.status='pending'
+
+LIMIT 2
+");
+
 ?>
 
 <?php
@@ -76,6 +168,103 @@ LIMIT 3
 
 ?>
 
+<?php
+
+$query_credit = mysqli_query($conn, "SELECT
+
+SUM(payment_credit) total
+
+FROM member
+
+WHERE id_user = $user_id
+
+");
+
+$data_credit = mysqli_fetch_assoc($query_credit);
+
+
+
+$query_belum = mysqli_query($conn, "SELECT
+
+COUNT(*) total
+
+FROM notifications
+
+WHERE receiver_id = $user_id
+
+AND type='bill'
+
+");
+
+$data_belum = mysqli_fetch_assoc($query_belum);
+
+?>
+
+<?php
+$tagihan = [];
+
+$query_bill = mysqli_query($conn, "
+
+SELECT
+
+groups.id_group,
+groups.nama_grub,
+
+payment_periods.payment_amount,
+
+member.payment_credit
+
+FROM member
+
+JOIN groups
+ON groups.id_group = member.id_group
+
+LEFT JOIN payment_periods
+ON payment_periods.group_id = groups.id_group
+AND payment_periods.is_closed = 0
+
+WHERE member.id_user='$user_id'
+
+");
+
+while($data = mysqli_fetch_assoc($query_bill)){
+
+    $target =
+    $data['payment_amount']
+    ??
+    0;
+
+    $credit =
+    $data['payment_credit']
+    ??
+    0;
+
+    $kurang =
+    max(
+        $target - $credit,
+        0
+    );
+
+    if($kurang > 0){
+
+        $tagihan[] = [
+
+            'group'=>
+            $data['nama_grub'],
+
+            'id'=>
+            $data['id_group'],
+
+            'kurang'=>
+            $kurang
+
+        ];
+
+    }
+
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,72 +276,316 @@ LIMIT 3
 <body>
     <div class="layout">
         <?php
-            sidebar('index.php', 'user/group.php', 'user/tagihan.php', 'auth/logout.php', 'user/akun.php', 'dashboard', 'assets/chart-2.png', 'assets/people.png', 'assets/card-pos.png', 'assets/person.png', '    assets/logout.png');
+            sidebar('koneksi/koneksi.php','index.php', 'user/group.php', 'user/tagihan.php', 'user/inbox.php', 'user/report.php', 'auth/logout.php', 'user/akun.php', 'dashboard', 'assets/chart-2.png', 'assets/people.png', 'assets/card-pos.png', 'assets/mail.png', 'assets/clock.png', 'assets/person.png', 'assets/logout.png');
         ?>
         <div class="main-content">
             <h1>Dashboard</h1>
             <div class="dashboard-atas">
-                <div class="dashboard1">
-                    <h3>Total Saldo</h3>
-                    <h1 style="color: green;">Rp<?= number_format($data_saldo['saldo'] ?? 0, 0, ',', '.') ?></h1>
+
+                <div class="dashboard-card">
+
+                <h3>Total Saldo</h3>
+
+                <h1 class="green">
+                Rp<?= number_format($data_saldo['saldo'] ?? 0,0,',','.') ?>
+                </h1>
+
+                <div class="mini-stat">
+
+                <div>
+
+                <small>Masuk 7 hari</small>
+
+                <p>
+                Rp<?= number_format($data_masuk['total'] ?? 0) ?>
+                </p>
+
                 </div>
-                <div class="dashboard1">
-                    <h3>Pembayaran bulan ini</h3>
-                    <h1 style="color: Blue;">Rp<?= number_format($data_bayar['total'] ?? 0, 0, ',', '.') ?></h1>
+
+                <div>
+
+                <small>Keluar 7 hari</small>
+
+                <p>
+                Rp<?= number_format($data_keluar['total'] ?? 0) ?>
+                </p>
+
                 </div>
-                <div class="dashboard1">
-                    <h3>Tagihan Aktif</h3>
-                        <div class="tagihan-mini">
-                            <?php $total_show = 0; ?>
-                            <?php while($group = mysqli_fetch_assoc($query_group)) { ?>
 
-                                <?php
+                </div>
 
-                                $id_group = $group['id_group'];
+                </div>
 
-                                $cek_bayar = mysqli_query($conn, "SELECT * FROM transactions
-                                WHERE user_id = $user_id
-                                AND group_id = $id_group
-                                AND MONTH(date) = MONTH(CURRENT_DATE())
-                                AND YEAR(date) = YEAR(CURRENT_DATE())
-                                ");
 
-                                $sudah_bayar = mysqli_num_rows($cek_bayar) > 0;
 
-                                ?>
+                <div class="dashboard-card">
 
-                                <?php if(!$sudah_bayar) { ?>
-                                    <?php $total_show++; ?>
+                    <h2>
+                        Tagihan Aktif
+                    </h2>
 
-                                    <div class="tagihan-itemmini">
+                    <?php if(count($tagihan)>0){ ?>
 
-                                        <div>
-                                            <h3><?= $group['nama_grub'] ?></h3>
-                                        </div>
+                        <div class="bill-list">
 
-                                        <div class="statusnya unpaidnya">
-                                            <p>
-                                                Tagihan bulan <?= date('F Y') ?>
-                                            </p>
-                                        </div>
+                            <?php foreach($tagihan as $bill){ ?>
+
+                                <div class="bill-item">
+
+                                    <div>
+
+                                        <b>
+
+                                            <?= $bill['group'] ?>
+
+                                        </b>
+
+                                        <p>
+
+                                            Belum bayar
+                                            Rp<?= number_format($bill['kurang']) ?>
+
+                                        </p>
 
                                     </div>
 
-                                <?php } ?>
-                                <?php
-                                    if($total_show >= 5){
-                                        break;
-                                    }
-                                ?>
+                                    <a
+                                    class="bill-btn"
+
+                                    href="user/isigroup.php?group=<?= $bill['id'] ?>">
+
+                                        Buka Grup
+
+                                    </a>
+
+                                </div>
 
                             <?php } ?>
-                            
 
                         </div>
+
+                        <small>
+
+                            Total
+                            <?= count($tagihan) ?>
+                            tagihan aktif
+
+                        </small>
+
+                    <?php }else{ ?>
+
+                        <div class="dashboard-empty">
+
+                            ✓ Semua tagihan lunas
+
+                        </div>
+
+                    <?php } ?>
+
                 </div>
+
+
+                <div class="dashboard-card">
+
+            <?php if($data_pending['total'] > 0){ ?>
+
+                <h3>
+
+                    Konfirmasi Bayar
+
+                </h3>
+
+                <h1 class="blue">
+
+                    <?= $data_pending['total'] ?>
+
+                </h1>
+
+                <p>
+
+                    Menunggu persetujuan
+
+                </p>
+
+                <?php
+                while(
+                    $row =
+                    mysqli_fetch_assoc(
+                        $query_preview
+                    )
+                ){
+                ?>
+
+                    <div class="dashboard-request">
+
+                        <b>
+
+                            <?= $row['username'] ?>
+
+                        </b>
+
+                        <br>
+
+                        Rp
+                        <?= number_format($row['amount']) ?>
+
+                    </div>
+
+                <?php } ?>
+
+                <a
+                    class="lihat-tagihan"
+                    href="user/inbox.php"
+                >
+
+                    Buka Inbox
+
+                </a>
+
+            <?php } else { ?>
+
+                <h3>
+
+                    Grup Saya
+
+                </h3>
+
+                <h1 class="blue">
+
+                    <?= $data_grup['total'] ?? 0 ?>
+
+                </h1>
+
+                <div class="mini-stat">
+
+                    <div>
+
+                        <small>
+
+                            Admin
+
+                        </small>
+
+                        <p>
+
+                            <?= $data_grup['admin_total'] ?? 0 ?>
+
+                        </p>
+
+                    </div>
+
+                    <div>
+
+                        <small>
+
+                            Member
+
+                        </small>
+
+                        <p>
+
+                            <?= ($data_grup['total'] ?? 0)
+                            -
+                            ($data_grup['admin_total'] ?? 0)
+                            ?>
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            <?php } ?>
+
             </div>
 
-            <br>
+                </div>
+
+
+            <div class="dashboard-middle">
+
+                <div class="quick-card">
+
+                    <h3>Aksi Cepat</h3>
+
+                    <div class="quick-grid">
+
+                        <a href="user/group.php">
+
+                            Grup
+
+                        </a>
+
+                        <a href="user/tagihan.php">
+
+                            Tagihan
+
+                        </a>
+
+                        <a href="user/inbox.php">
+
+                            Inbox
+
+                        </a>
+
+                        <a href="user/akun.php">
+
+                            Akun
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="quick-card">
+
+                    <h3>Status Saya</h3>
+
+                    <div class="status-box">
+
+                        <div>
+
+                            <small>Tagihan aktif</small>
+
+                            <h2>
+
+                                <?= $data_belum['total'] ?>
+
+                            </h2>
+
+                        </div>
+
+
+
+                        <div>
+
+                            <small>Carry Over</small>
+
+                            <h2>
+
+                                Rp<?= number_format($data_credit['total'] ?? 0) ?>
+
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                    <a
+                        class="lihat-tagihan"
+                        href="user/tagihan.php"
+                    >
+
+                        Lihat Tagihan
+
+                    </a>
+
+                </div>
+
+            </div>
 
             <div class="dashboard-bawah">
                     <div class="dashboard1">
